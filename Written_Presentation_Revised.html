@@ -1,0 +1,1385 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.5.43">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Nima Nikkhah CS 670">
+
+<title>Predicting The Direction of DJIA Index Movement Based On Daily News Dataset And DJIA Index Time Series</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="Written_Presentation_Revised_files/libs/clipboard/clipboard.min.js"></script>
+<script src="Written_Presentation_Revised_files/libs/quarto-html/quarto.js"></script>
+<script src="Written_Presentation_Revised_files/libs/quarto-html/popper.min.js"></script>
+<script src="Written_Presentation_Revised_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="Written_Presentation_Revised_files/libs/quarto-html/anchor.min.js"></script>
+<link href="Written_Presentation_Revised_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="Written_Presentation_Revised_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="Written_Presentation_Revised_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="Written_Presentation_Revised_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="Written_Presentation_Revised_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+
+
+</head>
+
+<body class="fullcontent">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Predicting The Direction of DJIA Index Movement Based On Daily News Dataset And DJIA Index Time Series</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Nima Nikkhah<br>
+CS 670 </p>
+          </div>
+  </div>
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="introduction" class="level2">
+<h2 class="anchored" data-anchor-id="introduction">Introduction</h2>
+<p>In this project, I have worked on the stock market data, i.e.&nbsp;DJIA index of stock exchanges in the United States. In particular, I want to evaluate the effect of Fundamental Analysis (in this project, only by considering important daily news) on predicting the value of DJIA index against the effect of Technical Analysis on predicting that index. Fundamental analysis focuses on the quality of an asset, while technical analysis looks at market trends as an indicator of value.</p>
+<p>Dow Jones Industrial Average (DJIA) is a stock market index that tracks 30 large and prominent companies listed on Stock Exchanges in the United States. In this project, we use two different datasets for trying to predict the direction of the movement of this index.</p>
+</section>
+<section id="datasets" class="level2">
+<h2 class="anchored" data-anchor-id="datasets">Datasets</h2>
+<ul>
+<li>The first dataset that I have used consists of the Top 25 daily news from August 8th 2008 to July 1st 2016 as well as a binary value called <strong>Lable</strong>. This value is equal to 1, whenever the price of DJIA index at market close in the current date is equal or larger than the DJIA index at market close of the previous buisiness day, otherwise this value is zero. In this project, I am considering four different ways of defining the features (the input value of the learning method) based on the top 25 news of each day. These four feature sets are Top1 News, Top5 News, Top10 News, and Top25 News. The following table summarizes the values of this dataset. Also, This dataset can be found at <a href="https://www.kaggle.com/datasets/aaron7sun/stocknews" class="uri">https://www.kaggle.com/datasets/aaron7sun/stocknews</a>.</li>
+</ul>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 57%">
+<col style="width: 42%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: center;">Value</th>
+<th style="text-align: center;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">Date</td>
+<td style="text-align: center;">The date in which the Label value is calculated and the news are collected</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;"><br> Label</td>
+<td style="text-align: center;">A binary value showing whether the DJIA index is increased/stayed the same (= 1) or it is decreased compared to the DJIA index of the previous buisiness day (= 0)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">Top1 - Top 25</td>
+<td style="text-align: center;">25 different columns containing the top 25 most important news of each day</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>The second dataset is the time series of DJIA index from January 3rd 2006 to December 29th 2017. The values of this dataset are Date, Open, High, Low, Close, Volume and Name. Among these values, only Date, Close, and Volume can be useful for the prediction tasks, since the rest of the values, except for Name which is an insignificant qualitative value, are highly correlated with the Close value (as we show in the visualization section). Among these correlated values, we choose Close to be compatible with the Daily News dataset. I also had to add a <strong>Label</strong> value to this dataset to be able to use the dataset for classification. This value is calculated the same way that the Label value of Daily News dataset is calculated. The following table summarizes the values of this dataset. Also, This dataset can be found at <a href="https://www.kaggle.com/datasets/szrlee/stock-time-series-20050101-to-20171231" class="uri">https://www.kaggle.com/datasets/szrlee/stock-time-series-20050101-to-20171231</a>.</li>
+</ul>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: center;">Value</th>
+<th style="text-align: center;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">Date</td>
+<td style="text-align: center;">The date in which the rest of DJIA index values are collected</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">Open</td>
+<td style="text-align: center;">Price of the stock at market open</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">High</td>
+<td style="text-align: center;">Highest price reached in the day</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">Low</td>
+<td style="text-align: center;">Lowest price reached in the day</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">Close</td>
+<td style="text-align: center;">Price of the stock at market close</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">Volume</td>
+<td style="text-align: center;">Number of shares traded</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">Name</td>
+<td style="text-align: center;">The stock’s ticker name</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">Label</td>
+<td style="text-align: center;">A binary value that is calculated the same way that the <strong>Label</strong> value of Daily News dataset is calculated.</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="questions" class="level2">
+<h2 class="anchored" data-anchor-id="questions">Questions</h2>
+<p>The main question that I will try to answer in this project is “which type of analysis can be a better fit for predicting the value of DJIA index?”, however, for answering this general question I need to work on answering more detailed questions listed below:</p>
+<ol type="1">
+<li><p>How often should we train our models? Is there any specific difference between the results of training the models with short time intervals (i.e.&nbsp;7 days) of data and training them with medium time intervals (i.e.&nbsp;20 days) of data and training them with long time intervals (i.e.&nbsp;250 days) of data?</p></li>
+<li><p>Which features are more significant for the prediction task? For the Daily News dataset, does the number of daily news (which can be between 1 to 25) that we choose for training our model affects the accuracy of the model? For the time series dataset, what combination of Date and Volume predictors can be most helpful?</p></li>
+<li><p>Finally, is there an optimal training time interval? Specifically, is finding pattern more feasible among any of the short, medium, and long time intervals?</p></li>
+</ol>
+</section>
+<section id="visualization" class="level2">
+<h2 class="anchored" data-anchor-id="visualization">Visualization</h2>
+<ul>
+<li>The following plot shows the number of datapoints for each label value of DJIA Time Series dataset. The same code also is used for adding the <strong>Label</strong> column to the dataset.</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>tseries <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"AABA_2006-01-01_to_2018-01-01.csv"</span>)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>tseries<span class="sc">$</span>Date <span class="ot">&lt;-</span> <span class="fu">as.Date</span>(tseries<span class="sc">$</span>Date)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>Label <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">0</span>)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>count <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">2</span><span class="sc">:</span><span class="dv">3019</span>){</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (tseries<span class="sc">$</span>Close[i] <span class="sc">&lt;</span> tseries<span class="sc">$</span>Close[(i<span class="dv">-1</span>)]){</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    Label <span class="ot">&lt;-</span> <span class="fu">append</span>(Label, <span class="dv">0</span>)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> {</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    Label <span class="ot">&lt;-</span> <span class="fu">append</span>(Label, <span class="dv">1</span>)</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    count <span class="ot">&lt;-</span> count <span class="sc">+</span> <span class="dv">1</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>new_tseries <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(tseries, Label)</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="fu">barplot</span>(<span class="fu">c</span>(<span class="dv">3018</span> <span class="sc">-</span> count, count), <span class="at">names.arg =</span> <span class="fu">c</span>(<span class="st">"0"</span>, <span class="st">"1"</span>), <span class="at">xlab =</span> <span class="st">"Label"</span>, <span class="at">ylab =</span> <span class="st">"Number of Days"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Written_Presentation_Revised_files/figure-html/unnamed-chunk-1-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<ul>
+<li>The following heatmap plot shows that the only quantitative predictor that is not highly correlated with the Close value, is the Volume value which means except for the Date predictor, we should try using the Volume predictor for our regression and classification modeling, as well.</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggcorrplot)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>cor_mat <span class="ot">&lt;-</span> <span class="fu">cor</span>(tseries[, <span class="dv">2</span><span class="sc">:</span><span class="dv">6</span>])</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="fu">ggcorrplot</span>(cor_mat, <span class="at">method =</span> <span class="st">"circle"</span>) <span class="sc">+</span> <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Correlation Heatmap"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Written_Presentation_Revised_files/figure-html/unnamed-chunk-2-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<ul>
+<li>The following plot shows the entire time series data of DJIA Close value, as well as the linear regression model that is fitted to the entire DJIA Close range. We can see that the fitted model can predict the general increasing pattern of the time series, however, if we zoom in on any time interval, the linear model is not a good fit for estimating the value of DJIA Close.</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>p <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(tseries, <span class="fu">aes</span>(<span class="at">x=</span><span class="fu">as.Date</span>(Date), <span class="at">y=</span>Close, <span class="at">group =</span> <span class="dv">1</span>)) <span class="sc">+</span> <span class="fu">geom_line</span>() <span class="sc">+</span> <span class="fu">xlab</span>(<span class="st">"Date"</span>) <span class="sc">+</span> <span class="fu">scale_x_date</span>(<span class="at">date_breaks =</span> <span class="st">"20 month"</span>, <span class="at">date_labels =</span> <span class="st">"%Y %b %d"</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>p <span class="sc">+</span> <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"lm"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>`geom_smooth()` using formula = 'y ~ x'</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Written_Presentation_Revised_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<ul>
+<li><p>The codes for the Daily News dataset visualization is written in Python and the <strong>ipynb</strong> file can be found at: <a href="https://github.com/nimnik/CS-670/blob/main/visualization.ipynb" class="uri">https://github.com/nimnik/CS-670/blob/main/visualization.ipynb</a>.</p></li>
+<li><p>The following plot is showing the number of datapoints for each label in the Daily News dataset. We can observe that this dataset, same as the Time Series dataset, is slightly imbalanced towards the “1” label. The difference is not significant enough to cause issues with the model training and to some extent is understandable since the cases in which the DIJA Close value stays the same are also considered part of the Label “1” datapoints.</p></li>
+</ul>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="fig4.png" class="img-fluid figure-img"></p>
+<figcaption>Labels</figcaption>
+</figure>
+</div>
+<ul>
+<li>The following plot shows that the Top-15 frequent words in the Daily News dataset are not useful words and cannot be used for estimating the impact of the news on DJIA index.</li>
+</ul>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="fig1.png" class="img-fluid figure-img"></p>
+<figcaption>Top-15 Frequent Words</figcaption>
+</figure>
+</div>
+<ul>
+<li>The following plot shows that most of the news in the Daily News dataset have a word count between 8 and 12 and a very few number of news have word count larger than 50.</li>
+</ul>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="fig2.png" class="img-fluid figure-img"></p>
+<figcaption>Number of News per Word Count</figcaption>
+</figure>
+</div>
+<ul>
+<li>The following plot shows that most of the words in the Daily News dataset have a character count between 2 and 8 and a very few number of words have character count larger than 10.</li>
+</ul>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="fig3.png" class="img-fluid figure-img"></p>
+<figcaption>Number of Words per Character Count</figcaption>
+</figure>
+</div>
+</section>
+<section id="modeling---classification-for-time-series-dataset" class="level2">
+<h2 class="anchored" data-anchor-id="modeling---classification-for-time-series-dataset">Modeling - Classification for Time Series Dataset</h2>
+<ul>
+<li>For classifying the datapoints in DJIA Time Series dataset, I use two different methods, namely, Logistic Regression and KNN. For answering the first question (regarding the frequency of training), we consider three different sizes for training time interval. These sizes are 7 days (representing short time intervals), 20 days (representing medium time intervals), and 250 days (representing long time intervals). For each time interval size, We then train our model using the selected time interval and will test the model using the single datapoint that comes after the last training datapoint. For instance, for the 7-days time interval, when we train our model using the 5th datapoint until the 11th datapoint, we test the model using the 12th datapoint. We then calculate the number of false predictions (errors) in all of the scenarios (for each time interval size) and will calculate the accuracy of predictions using the calculated error. The following code generates these results for Logistic Regression model and using only the <strong>Date</strong> predictor.</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># The following code block prints the accuracy achieved by fitting a logistic</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="co"># regression model to short time intervals of the time series data when we use</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co"># only "Date" as the predictor</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>tseries <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"AABA_2006-01-01_to_2018-01-01.csv"</span>)</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>tseries<span class="sc">$</span>Date <span class="ot">&lt;-</span> <span class="fu">as.Date</span>(tseries<span class="sc">$</span>Date)</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>Label <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">0</span>)</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">2</span><span class="sc">:</span><span class="dv">3019</span>){</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (tseries<span class="sc">$</span>Close[i] <span class="sc">&lt;</span> tseries<span class="sc">$</span>Close[(i<span class="dv">-1</span>)]){</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>    Label <span class="ot">&lt;-</span> <span class="fu">append</span>(Label, <span class="dv">0</span>)</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> {</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>    Label <span class="ot">&lt;-</span> <span class="fu">append</span>(Label, <span class="dv">1</span>)</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>new_tseries <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(tseries, Label)</span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>weekly_error <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">2</span><span class="sc">:</span><span class="dv">3012</span>){</span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">suppressWarnings</span>({glm.fit <span class="ot">&lt;-</span> <span class="fu">glm</span>(Label <span class="sc">~</span> Date, <span class="at">data =</span> new_tseries[i<span class="sc">:</span>(i<span class="sc">+</span><span class="dv">6</span>),], <span class="at">family =</span> binomial)})</span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>  glm.probs <span class="ot">&lt;-</span> <span class="fu">predict</span>(glm.fit, <span class="at">newdata =</span> new_tseries[(i<span class="sc">+</span><span class="dv">7</span>),], <span class="at">type =</span> <span class="st">"response"</span>)</span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (glm.probs <span class="sc">&lt;</span> <span class="fl">0.5</span>){</span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>    weekly_error <span class="ot">&lt;-</span> weekly_error <span class="sc">+</span> <span class="fu">abs</span>(<span class="dv">0</span> <span class="sc">-</span> new_tseries<span class="sc">$</span>Label[(i<span class="sc">+</span><span class="dv">7</span>)])</span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> {</span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a>    weekly_error <span class="ot">&lt;-</span> weekly_error <span class="sc">+</span> <span class="fu">abs</span>(<span class="dv">1</span> <span class="sc">-</span> new_tseries<span class="sc">$</span>Label[(i<span class="sc">+</span><span class="dv">7</span>)])</span>
+<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>((<span class="dv">3011</span> <span class="sc">-</span> weekly_error) <span class="sc">/</span> <span class="dv">3011</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.4935237</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># The following code block prints the accuracy achieved by fitting a logistic</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="co"># regression model to medium time intervals of the time series data when we use</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="co"># only "Date" as the predictor</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>monthly_error <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">2</span><span class="sc">:</span><span class="dv">2999</span>){</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>  glm.fit <span class="ot">&lt;-</span> <span class="fu">glm</span>(Label <span class="sc">~</span> Date, <span class="at">data =</span> new_tseries[i<span class="sc">:</span>(i<span class="sc">+</span><span class="dv">19</span>),], <span class="at">family =</span> binomial)</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>  glm.probs <span class="ot">&lt;-</span> <span class="fu">predict</span>(glm.fit, <span class="at">newdata =</span> new_tseries[(i<span class="sc">+</span><span class="dv">20</span>),], <span class="at">type =</span> <span class="st">"response"</span>)</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (glm.probs <span class="sc">&lt;</span> <span class="fl">0.5</span>){</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>    monthly_error <span class="ot">&lt;-</span> monthly_error <span class="sc">+</span> <span class="fu">abs</span>(<span class="dv">0</span> <span class="sc">-</span> new_tseries<span class="sc">$</span>Label[(i<span class="sc">+</span><span class="dv">20</span>)])</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> {</span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>    monthly_error <span class="ot">&lt;-</span> monthly_error <span class="sc">+</span> <span class="fu">abs</span>(<span class="dv">1</span> <span class="sc">-</span> new_tseries<span class="sc">$</span>Label[(i<span class="sc">+</span><span class="dv">20</span>)])</span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>((<span class="dv">2998</span> <span class="sc">-</span> monthly_error) <span class="sc">/</span> <span class="dv">2998</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.4906604</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># The following code block prints the accuracy achieved by fitting a logistic</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="co"># regression model to long time intervals of the time series data when we use</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="co"># only "Date" as the predictor</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>annual_error <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">2</span><span class="sc">:</span><span class="dv">2769</span>){</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>  glm.fit <span class="ot">&lt;-</span> <span class="fu">glm</span>(Label <span class="sc">~</span> Date, <span class="at">data =</span> new_tseries[i<span class="sc">:</span>(i<span class="sc">+</span><span class="dv">249</span>),], <span class="at">family =</span> binomial)</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>  glm.probs <span class="ot">&lt;-</span> <span class="fu">predict</span>(glm.fit, <span class="at">newdata =</span> new_tseries[(i<span class="sc">+</span><span class="dv">250</span>),], <span class="at">type =</span> <span class="st">"response"</span>)</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (glm.probs <span class="sc">&lt;</span> <span class="fl">0.5</span>){</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>    annual_error <span class="ot">&lt;-</span> annual_error <span class="sc">+</span> <span class="fu">abs</span>(<span class="dv">0</span> <span class="sc">-</span> new_tseries<span class="sc">$</span>Label[(i<span class="sc">+</span><span class="dv">250</span>)])</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> {</span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>    annual_error <span class="ot">&lt;-</span> annual_error <span class="sc">+</span> <span class="fu">abs</span>(<span class="dv">1</span> <span class="sc">-</span> new_tseries<span class="sc">$</span>Label[(i<span class="sc">+</span><span class="dv">250</span>)])</span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>((<span class="dv">2768</span> <span class="sc">-</span> annual_error) <span class="sc">/</span> <span class="dv">2768</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.5133671</code></pre>
+</div>
+</div>
+<p>We repeat the same process for different combination of predictors (to answer the second question), namely, with <strong>Date + Volume</strong> and <strong>Volume</strong> as the predictor.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># The following code block prints the accuracy achieved by fitting a logistic</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="co"># regression model to short time intervals of the time series data when we use</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="co"># "Date + Volume" as the predictors</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>tseries <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"AABA_2006-01-01_to_2018-01-01.csv"</span>)</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>tseries<span class="sc">$</span>Date <span class="ot">&lt;-</span> <span class="fu">as.Date</span>(tseries<span class="sc">$</span>Date)</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>Label <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">0</span>)</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">2</span><span class="sc">:</span><span class="dv">3019</span>){</span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (tseries<span class="sc">$</span>Close[i] <span class="sc">&lt;</span> tseries<span class="sc">$</span>Close[(i<span class="dv">-1</span>)]){</span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>    Label <span class="ot">&lt;-</span> <span class="fu">append</span>(Label, <span class="dv">0</span>)</span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> {</span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>    Label <span class="ot">&lt;-</span> <span class="fu">append</span>(Label, <span class="dv">1</span>)</span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>new_tseries <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(tseries, Label)</span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a>weekly_error <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">2</span><span class="sc">:</span><span class="dv">3012</span>){</span>
+<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">suppressWarnings</span>({glm.fit <span class="ot">&lt;-</span> <span class="fu">glm</span>(Label <span class="sc">~</span> Date <span class="sc">+</span> Volume, <span class="at">data =</span> new_tseries[i<span class="sc">:</span>(i<span class="sc">+</span><span class="dv">6</span>),], <span class="at">family =</span> binomial)})</span>
+<span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a>  glm.probs <span class="ot">&lt;-</span> <span class="fu">predict</span>(glm.fit, <span class="at">newdata =</span> new_tseries[(i<span class="sc">+</span><span class="dv">7</span>),], <span class="at">type =</span> <span class="st">"response"</span>)</span>
+<span id="cb11-25"><a href="#cb11-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-26"><a href="#cb11-26" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (glm.probs <span class="sc">&lt;</span> <span class="fl">0.5</span>){</span>
+<span id="cb11-27"><a href="#cb11-27" aria-hidden="true" tabindex="-1"></a>    weekly_error <span class="ot">&lt;-</span> weekly_error <span class="sc">+</span> <span class="fu">abs</span>(<span class="dv">0</span> <span class="sc">-</span> new_tseries<span class="sc">$</span>Label[(i<span class="sc">+</span><span class="dv">7</span>)])</span>
+<span id="cb11-28"><a href="#cb11-28" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> {</span>
+<span id="cb11-29"><a href="#cb11-29" aria-hidden="true" tabindex="-1"></a>    weekly_error <span class="ot">&lt;-</span> weekly_error <span class="sc">+</span> <span class="fu">abs</span>(<span class="dv">1</span> <span class="sc">-</span> new_tseries<span class="sc">$</span>Label[(i<span class="sc">+</span><span class="dv">7</span>)])</span>
+<span id="cb11-30"><a href="#cb11-30" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb11-31"><a href="#cb11-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-32"><a href="#cb11-32" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb11-33"><a href="#cb11-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-34"><a href="#cb11-34" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>((<span class="dv">3011</span> <span class="sc">-</span> weekly_error) <span class="sc">/</span> <span class="dv">3011</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.5064763</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># The following code block prints the accuracy achieved by fitting a logistic</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="co"># regression model to medium time intervals of the time series data when we use</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="co"># "Date + Volume" as the predictors</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>monthly_error <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">2</span><span class="sc">:</span><span class="dv">2999</span>){</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>  glm.fit <span class="ot">&lt;-</span> <span class="fu">glm</span>(Label <span class="sc">~</span> Date <span class="sc">+</span> Volume, <span class="at">data =</span> new_tseries[i<span class="sc">:</span>(i<span class="sc">+</span><span class="dv">19</span>),], <span class="at">family =</span> binomial)</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>  glm.probs <span class="ot">&lt;-</span> <span class="fu">predict</span>(glm.fit, <span class="at">newdata =</span> new_tseries[(i<span class="sc">+</span><span class="dv">20</span>),], <span class="at">type =</span> <span class="st">"response"</span>)</span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (glm.probs <span class="sc">&lt;</span> <span class="fl">0.5</span>){</span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>    monthly_error <span class="ot">&lt;-</span> monthly_error <span class="sc">+</span> <span class="fu">abs</span>(<span class="dv">0</span> <span class="sc">-</span> new_tseries<span class="sc">$</span>Label[(i<span class="sc">+</span><span class="dv">20</span>)])</span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> {</span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>    monthly_error <span class="ot">&lt;-</span> monthly_error <span class="sc">+</span> <span class="fu">abs</span>(<span class="dv">1</span> <span class="sc">-</span> new_tseries<span class="sc">$</span>Label[(i<span class="sc">+</span><span class="dv">20</span>)])</span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>((<span class="dv">2998</span> <span class="sc">-</span> monthly_error) <span class="sc">/</span> <span class="dv">2998</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.4873249</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># The following code block prints the accuracy achieved by fitting a logistic</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="co"># regression model to long time intervals of the time series data when we use</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="co"># "Date + Volume" as the predictors</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>annual_error <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">2</span><span class="sc">:</span><span class="dv">2769</span>){</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>  glm.fit <span class="ot">&lt;-</span> <span class="fu">glm</span>(Label <span class="sc">~</span> Date <span class="sc">+</span> Volume, <span class="at">data =</span> new_tseries[i<span class="sc">:</span>(i<span class="sc">+</span><span class="dv">249</span>),], <span class="at">family =</span> binomial)</span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>  glm.probs <span class="ot">&lt;-</span> <span class="fu">predict</span>(glm.fit, <span class="at">newdata =</span> new_tseries[(i<span class="sc">+</span><span class="dv">250</span>),], <span class="at">type =</span> <span class="st">"response"</span>)</span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (glm.probs <span class="sc">&lt;</span> <span class="fl">0.5</span>){</span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>    annual_error <span class="ot">&lt;-</span> annual_error <span class="sc">+</span> <span class="fu">abs</span>(<span class="dv">0</span> <span class="sc">-</span> new_tseries<span class="sc">$</span>Label[(i<span class="sc">+</span><span class="dv">250</span>)])</span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> {</span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>    annual_error <span class="ot">&lt;-</span> annual_error <span class="sc">+</span> <span class="fu">abs</span>(<span class="dv">1</span> <span class="sc">-</span> new_tseries<span class="sc">$</span>Label[(i<span class="sc">+</span><span class="dv">250</span>)])</span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>((<span class="dv">2768</span> <span class="sc">-</span> annual_error) <span class="sc">/</span> <span class="dv">2768</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.5209538</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># The following code block prints the accuracy achieved by fitting a logistic</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="co"># regression model to short time intervals of the time series data when we use</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="co"># only "Volume" as the predictor</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>tseries <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"AABA_2006-01-01_to_2018-01-01.csv"</span>)</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>tseries<span class="sc">$</span>Date <span class="ot">&lt;-</span> <span class="fu">as.Date</span>(tseries<span class="sc">$</span>Date)</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>Label <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">0</span>)</span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">2</span><span class="sc">:</span><span class="dv">3019</span>){</span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (tseries<span class="sc">$</span>Close[i] <span class="sc">&lt;</span> tseries<span class="sc">$</span>Close[(i<span class="dv">-1</span>)]){</span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>    Label <span class="ot">&lt;-</span> <span class="fu">append</span>(Label, <span class="dv">0</span>)</span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> {</span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a>    Label <span class="ot">&lt;-</span> <span class="fu">append</span>(Label, <span class="dv">1</span>)</span>
+<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-18"><a href="#cb17-18" aria-hidden="true" tabindex="-1"></a>new_tseries <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(tseries, Label)</span>
+<span id="cb17-19"><a href="#cb17-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-20"><a href="#cb17-20" aria-hidden="true" tabindex="-1"></a>weekly_error <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb17-21"><a href="#cb17-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-22"><a href="#cb17-22" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">2</span><span class="sc">:</span><span class="dv">3012</span>){</span>
+<span id="cb17-23"><a href="#cb17-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">suppressWarnings</span>({glm.fit <span class="ot">&lt;-</span> <span class="fu">glm</span>(Label <span class="sc">~</span> Volume, <span class="at">data =</span> new_tseries[i<span class="sc">:</span>(i<span class="sc">+</span><span class="dv">6</span>),], <span class="at">family =</span> binomial)})</span>
+<span id="cb17-24"><a href="#cb17-24" aria-hidden="true" tabindex="-1"></a>  glm.probs <span class="ot">&lt;-</span> <span class="fu">predict</span>(glm.fit, <span class="at">newdata =</span> new_tseries[(i<span class="sc">+</span><span class="dv">7</span>),], <span class="at">type =</span> <span class="st">"response"</span>)</span>
+<span id="cb17-25"><a href="#cb17-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-26"><a href="#cb17-26" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (glm.probs <span class="sc">&lt;</span> <span class="fl">0.5</span>){</span>
+<span id="cb17-27"><a href="#cb17-27" aria-hidden="true" tabindex="-1"></a>    weekly_error <span class="ot">&lt;-</span> weekly_error <span class="sc">+</span> <span class="fu">abs</span>(<span class="dv">0</span> <span class="sc">-</span> new_tseries<span class="sc">$</span>Label[(i<span class="sc">+</span><span class="dv">7</span>)])</span>
+<span id="cb17-28"><a href="#cb17-28" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> {</span>
+<span id="cb17-29"><a href="#cb17-29" aria-hidden="true" tabindex="-1"></a>    weekly_error <span class="ot">&lt;-</span> weekly_error <span class="sc">+</span> <span class="fu">abs</span>(<span class="dv">1</span> <span class="sc">-</span> new_tseries<span class="sc">$</span>Label[(i<span class="sc">+</span><span class="dv">7</span>)])</span>
+<span id="cb17-30"><a href="#cb17-30" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb17-31"><a href="#cb17-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-32"><a href="#cb17-32" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb17-33"><a href="#cb17-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-34"><a href="#cb17-34" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>((<span class="dv">3011</span> <span class="sc">-</span> weekly_error) <span class="sc">/</span> <span class="dv">3011</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.4995018</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># The following code block prints the accuracy achieved by fitting a logistic</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="co"># regression model to medium time intervals of the time series data when we use</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="co"># only "Volume" as the predictor</span></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>monthly_error <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">2</span><span class="sc">:</span><span class="dv">2999</span>){</span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>  glm.fit <span class="ot">&lt;-</span> <span class="fu">glm</span>(Label <span class="sc">~</span> Volume, <span class="at">data =</span> new_tseries[i<span class="sc">:</span>(i<span class="sc">+</span><span class="dv">19</span>),], <span class="at">family =</span> binomial)</span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>  glm.probs <span class="ot">&lt;-</span> <span class="fu">predict</span>(glm.fit, <span class="at">newdata =</span> new_tseries[(i<span class="sc">+</span><span class="dv">20</span>),], <span class="at">type =</span> <span class="st">"response"</span>)</span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (glm.probs <span class="sc">&lt;</span> <span class="fl">0.5</span>){</span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>    monthly_error <span class="ot">&lt;-</span> monthly_error <span class="sc">+</span> <span class="fu">abs</span>(<span class="dv">0</span> <span class="sc">-</span> new_tseries<span class="sc">$</span>Label[(i<span class="sc">+</span><span class="dv">20</span>)])</span>
+<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> {</span>
+<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a>    monthly_error <span class="ot">&lt;-</span> monthly_error <span class="sc">+</span> <span class="fu">abs</span>(<span class="dv">1</span> <span class="sc">-</span> new_tseries<span class="sc">$</span>Label[(i<span class="sc">+</span><span class="dv">20</span>)])</span>
+<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb19-16"><a href="#cb19-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-17"><a href="#cb19-17" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb19-18"><a href="#cb19-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-19"><a href="#cb19-19" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>((<span class="dv">2998</span> <span class="sc">-</span> monthly_error) <span class="sc">/</span> <span class="dv">2998</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.5063376</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># The following code block prints the accuracy achieved by fitting a logistic</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="co"># regression model to long time intervals of the time series data when we use</span></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="co"># only "Volume" as the predictor</span></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>annual_error <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">2</span><span class="sc">:</span><span class="dv">2769</span>){</span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>  glm.fit <span class="ot">&lt;-</span> <span class="fu">glm</span>(Label <span class="sc">~</span> Volume, <span class="at">data =</span> new_tseries[i<span class="sc">:</span>(i<span class="sc">+</span><span class="dv">249</span>),], <span class="at">family =</span> binomial)</span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>  glm.probs <span class="ot">&lt;-</span> <span class="fu">predict</span>(glm.fit, <span class="at">newdata =</span> new_tseries[(i<span class="sc">+</span><span class="dv">250</span>),], <span class="at">type =</span> <span class="st">"response"</span>)</span>
+<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (glm.probs <span class="sc">&lt;</span> <span class="fl">0.5</span>){</span>
+<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a>    annual_error <span class="ot">&lt;-</span> annual_error <span class="sc">+</span> <span class="fu">abs</span>(<span class="dv">0</span> <span class="sc">-</span> new_tseries<span class="sc">$</span>Label[(i<span class="sc">+</span><span class="dv">250</span>)])</span>
+<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> {</span>
+<span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a>    annual_error <span class="ot">&lt;-</span> annual_error <span class="sc">+</span> <span class="fu">abs</span>(<span class="dv">1</span> <span class="sc">-</span> new_tseries<span class="sc">$</span>Label[(i<span class="sc">+</span><span class="dv">250</span>)])</span>
+<span id="cb21-15"><a href="#cb21-15" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb21-16"><a href="#cb21-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-17"><a href="#cb21-17" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb21-18"><a href="#cb21-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-19"><a href="#cb21-19" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>((<span class="dv">2768</span> <span class="sc">-</span> annual_error) <span class="sc">/</span> <span class="dv">2768</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.5111994</code></pre>
+</div>
+</div>
+<p>We can see that among the generated results, the best accuracy is achieved by using <strong>Date + Volume</strong> predictor for 250-day training time interval.</p>
+<ul>
+<li>We now use the same time intervals to train KNN model, once using <strong>Date</strong> predictor and once using <strong>Volume</strong> predictor.</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># The following code block prints the accuracy achieved by fitting a KNN model</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="co"># to short time intervals of the time series data when we use</span></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a><span class="co"># only "Date" as the predictor</span></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(class)</span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>tseries <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"AABA_2006-01-01_to_2018-01-01.csv"</span>)</span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>tseries<span class="sc">$</span>Date <span class="ot">&lt;-</span> <span class="fu">as.Date</span>(tseries<span class="sc">$</span>Date)</span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a>Label <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">0</span>)</span>
+<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">2</span><span class="sc">:</span><span class="dv">3019</span>){</span>
+<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (tseries<span class="sc">$</span>Close[i] <span class="sc">&lt;</span> tseries<span class="sc">$</span>Close[(i<span class="dv">-1</span>)]){</span>
+<span id="cb23-14"><a href="#cb23-14" aria-hidden="true" tabindex="-1"></a>    Label <span class="ot">&lt;-</span> <span class="fu">append</span>(Label, <span class="dv">0</span>)</span>
+<span id="cb23-15"><a href="#cb23-15" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> {</span>
+<span id="cb23-16"><a href="#cb23-16" aria-hidden="true" tabindex="-1"></a>    Label <span class="ot">&lt;-</span> <span class="fu">append</span>(Label, <span class="dv">1</span>)</span>
+<span id="cb23-17"><a href="#cb23-17" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb23-18"><a href="#cb23-18" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb23-19"><a href="#cb23-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-20"><a href="#cb23-20" aria-hidden="true" tabindex="-1"></a>new_tseries <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(tseries, Label)</span>
+<span id="cb23-21"><a href="#cb23-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-22"><a href="#cb23-22" aria-hidden="true" tabindex="-1"></a>weekly_error <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb23-23"><a href="#cb23-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-24"><a href="#cb23-24" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">2</span><span class="sc">:</span><span class="dv">3012</span>){</span>
+<span id="cb23-25"><a href="#cb23-25" aria-hidden="true" tabindex="-1"></a>  train.X <span class="ot">&lt;-</span> new_tseries<span class="sc">$</span>Date[i<span class="sc">:</span>(i<span class="sc">+</span><span class="dv">6</span>)]</span>
+<span id="cb23-26"><a href="#cb23-26" aria-hidden="true" tabindex="-1"></a>  test.X <span class="ot">&lt;-</span> new_tseries<span class="sc">$</span>Date[(i<span class="sc">+</span><span class="dv">7</span>)]</span>
+<span id="cb23-27"><a href="#cb23-27" aria-hidden="true" tabindex="-1"></a>  trgt <span class="ot">&lt;-</span> new_tseries<span class="sc">$</span>Label[i<span class="sc">:</span>(i<span class="sc">+</span><span class="dv">6</span>)]</span>
+<span id="cb23-28"><a href="#cb23-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-29"><a href="#cb23-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set.seed</span>(<span class="dv">1</span>)</span>
+<span id="cb23-30"><a href="#cb23-30" aria-hidden="true" tabindex="-1"></a>  knn.pred <span class="ot">&lt;-</span> <span class="fu">knn</span>(<span class="at">train =</span> train.X, <span class="at">test =</span> test.X, trgt, <span class="at">k =</span> <span class="dv">4</span>)</span>
+<span id="cb23-31"><a href="#cb23-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-32"><a href="#cb23-32" aria-hidden="true" tabindex="-1"></a>  t <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(<span class="fu">as.character</span>(knn.pred))</span>
+<span id="cb23-33"><a href="#cb23-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-34"><a href="#cb23-34" aria-hidden="true" tabindex="-1"></a>  weekly_error <span class="ot">&lt;-</span> weekly_error <span class="sc">+</span> <span class="fu">abs</span>(t <span class="sc">-</span> new_tseries<span class="sc">$</span>Label[(i<span class="sc">+</span><span class="dv">7</span>)])</span>
+<span id="cb23-35"><a href="#cb23-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-36"><a href="#cb23-36" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb23-37"><a href="#cb23-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-38"><a href="#cb23-38" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>((<span class="dv">3011</span> <span class="sc">-</span> weekly_error) <span class="sc">/</span> <span class="dv">3011</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.5051478</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co"># The following code block prints the accuracy achieved by fitting a KNN model</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="co"># to short time intervals of the time series data when we use</span></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a><span class="co"># only "Volume" as the predictor</span></span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>weekly_error <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">2</span><span class="sc">:</span><span class="dv">3012</span>){</span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>  train.X <span class="ot">&lt;-</span> new_tseries<span class="sc">$</span>Volume[i<span class="sc">:</span>(i<span class="sc">+</span><span class="dv">6</span>)]</span>
+<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a>  test.X <span class="ot">&lt;-</span> new_tseries<span class="sc">$</span>Volume[(i<span class="sc">+</span><span class="dv">7</span>)]</span>
+<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a>  trgt <span class="ot">&lt;-</span> new_tseries<span class="sc">$</span>Label[i<span class="sc">:</span>(i<span class="sc">+</span><span class="dv">6</span>)]</span>
+<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set.seed</span>(<span class="dv">1</span>)</span>
+<span id="cb25-13"><a href="#cb25-13" aria-hidden="true" tabindex="-1"></a>  knn.pred <span class="ot">&lt;-</span> <span class="fu">knn</span>(<span class="at">train =</span> train.X, <span class="at">test =</span> test.X, trgt, <span class="at">k =</span> <span class="dv">2</span>)</span>
+<span id="cb25-14"><a href="#cb25-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-15"><a href="#cb25-15" aria-hidden="true" tabindex="-1"></a>  t <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(<span class="fu">as.character</span>(knn.pred))</span>
+<span id="cb25-16"><a href="#cb25-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-17"><a href="#cb25-17" aria-hidden="true" tabindex="-1"></a>  weekly_error <span class="ot">&lt;-</span> weekly_error <span class="sc">+</span> <span class="fu">abs</span>(t <span class="sc">-</span> new_tseries<span class="sc">$</span>Label[(i<span class="sc">+</span><span class="dv">7</span>)])</span>
+<span id="cb25-18"><a href="#cb25-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-19"><a href="#cb25-19" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb25-20"><a href="#cb25-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-21"><a href="#cb25-21" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>((<span class="dv">3011</span> <span class="sc">-</span> weekly_error) <span class="sc">/</span> <span class="dv">3011</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.5088011</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co"># The following code block prints the accuracy achieved by fitting a KNN model</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="co"># to medium time intervals of the time series data when we use</span></span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a><span class="co"># only "Date" as the predictor</span></span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>monthly_error <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">2</span><span class="sc">:</span><span class="dv">2999</span>){</span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>  train.X <span class="ot">&lt;-</span> new_tseries<span class="sc">$</span>Date[i<span class="sc">:</span>(i<span class="sc">+</span><span class="dv">19</span>)]</span>
+<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a>  test.X <span class="ot">&lt;-</span> new_tseries<span class="sc">$</span>Date[(i<span class="sc">+</span><span class="dv">20</span>)]</span>
+<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a>  trgt <span class="ot">&lt;-</span> new_tseries<span class="sc">$</span>Label[i<span class="sc">:</span>(i<span class="sc">+</span><span class="dv">19</span>)]</span>
+<span id="cb27-11"><a href="#cb27-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-12"><a href="#cb27-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set.seed</span>(<span class="dv">1</span>)</span>
+<span id="cb27-13"><a href="#cb27-13" aria-hidden="true" tabindex="-1"></a>  knn.pred <span class="ot">&lt;-</span> <span class="fu">knn</span>(<span class="at">train =</span> train.X, <span class="at">test =</span> test.X, trgt, <span class="at">k =</span> <span class="dv">4</span>)</span>
+<span id="cb27-14"><a href="#cb27-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-15"><a href="#cb27-15" aria-hidden="true" tabindex="-1"></a>  t <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(<span class="fu">as.character</span>(knn.pred))</span>
+<span id="cb27-16"><a href="#cb27-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-17"><a href="#cb27-17" aria-hidden="true" tabindex="-1"></a>  monthly_error <span class="ot">&lt;-</span> monthly_error <span class="sc">+</span> <span class="fu">abs</span>(t <span class="sc">-</span> new_tseries<span class="sc">$</span>Label[(i<span class="sc">+</span><span class="dv">20</span>)])</span>
+<span id="cb27-18"><a href="#cb27-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-19"><a href="#cb27-19" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb27-20"><a href="#cb27-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-21"><a href="#cb27-21" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>((<span class="dv">2998</span> <span class="sc">-</span> monthly_error) <span class="sc">/</span> <span class="dv">2998</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.5053369</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="co"># The following code block prints the accuracy achieved by fitting a KNN model</span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a><span class="co"># to medium time intervals of the time series data when we use</span></span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a><span class="co"># only "Volume" as the predictor</span></span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>monthly_error <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">2</span><span class="sc">:</span><span class="dv">2999</span>){</span>
+<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a>  train.X <span class="ot">&lt;-</span> new_tseries<span class="sc">$</span>Volume[i<span class="sc">:</span>(i<span class="sc">+</span><span class="dv">19</span>)]</span>
+<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a>  test.X <span class="ot">&lt;-</span> new_tseries<span class="sc">$</span>Volume[(i<span class="sc">+</span><span class="dv">20</span>)]</span>
+<span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a>  trgt <span class="ot">&lt;-</span> new_tseries<span class="sc">$</span>Label[i<span class="sc">:</span>(i<span class="sc">+</span><span class="dv">19</span>)]</span>
+<span id="cb29-11"><a href="#cb29-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-12"><a href="#cb29-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set.seed</span>(<span class="dv">1</span>)</span>
+<span id="cb29-13"><a href="#cb29-13" aria-hidden="true" tabindex="-1"></a>  knn.pred <span class="ot">&lt;-</span> <span class="fu">knn</span>(<span class="at">train =</span> train.X, <span class="at">test =</span> test.X, trgt, <span class="at">k =</span> <span class="dv">2</span>)</span>
+<span id="cb29-14"><a href="#cb29-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-15"><a href="#cb29-15" aria-hidden="true" tabindex="-1"></a>  t <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(<span class="fu">as.character</span>(knn.pred))</span>
+<span id="cb29-16"><a href="#cb29-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-17"><a href="#cb29-17" aria-hidden="true" tabindex="-1"></a>  monthly_error <span class="ot">&lt;-</span> monthly_error <span class="sc">+</span> <span class="fu">abs</span>(t <span class="sc">-</span> new_tseries<span class="sc">$</span>Label[(i<span class="sc">+</span><span class="dv">20</span>)])</span>
+<span id="cb29-18"><a href="#cb29-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-19"><a href="#cb29-19" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb29-20"><a href="#cb29-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-21"><a href="#cb29-21" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>((<span class="dv">2998</span> <span class="sc">-</span> monthly_error) <span class="sc">/</span> <span class="dv">2998</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.5096731</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="co"># The following code block prints the accuracy achieved by fitting a KNN model</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a><span class="co"># to long time intervals of the time series data when we use</span></span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a><span class="co"># only "Date" as the predictor</span></span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a>annual_error <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">2</span><span class="sc">:</span><span class="dv">2769</span>){</span>
+<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a>  train.X <span class="ot">&lt;-</span> new_tseries<span class="sc">$</span>Date[i<span class="sc">:</span>(i<span class="sc">+</span><span class="dv">249</span>)]</span>
+<span id="cb31-9"><a href="#cb31-9" aria-hidden="true" tabindex="-1"></a>  test.X <span class="ot">&lt;-</span> new_tseries<span class="sc">$</span>Date[(i<span class="sc">+</span><span class="dv">250</span>)]</span>
+<span id="cb31-10"><a href="#cb31-10" aria-hidden="true" tabindex="-1"></a>  trgt <span class="ot">&lt;-</span> new_tseries<span class="sc">$</span>Label[i<span class="sc">:</span>(i<span class="sc">+</span><span class="dv">249</span>)]</span>
+<span id="cb31-11"><a href="#cb31-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-12"><a href="#cb31-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set.seed</span>(<span class="dv">1</span>)</span>
+<span id="cb31-13"><a href="#cb31-13" aria-hidden="true" tabindex="-1"></a>  knn.pred <span class="ot">&lt;-</span> <span class="fu">knn</span>(<span class="at">train =</span> train.X, <span class="at">test =</span> test.X, trgt, <span class="at">k =</span> <span class="dv">50</span>)</span>
+<span id="cb31-14"><a href="#cb31-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-15"><a href="#cb31-15" aria-hidden="true" tabindex="-1"></a>  t <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(<span class="fu">as.character</span>(knn.pred))</span>
+<span id="cb31-16"><a href="#cb31-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-17"><a href="#cb31-17" aria-hidden="true" tabindex="-1"></a>  annual_error <span class="ot">&lt;-</span> annual_error <span class="sc">+</span> <span class="fu">abs</span>(t <span class="sc">-</span> new_tseries<span class="sc">$</span>Label[(i<span class="sc">+</span><span class="dv">250</span>)])</span>
+<span id="cb31-18"><a href="#cb31-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-19"><a href="#cb31-19" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb31-20"><a href="#cb31-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-21"><a href="#cb31-21" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>((<span class="dv">2768</span> <span class="sc">-</span> annual_error) <span class="sc">/</span> <span class="dv">2768</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.5205925</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="co"># The following code block prints the accuracy achieved by fitting a KNN model</span></span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a><span class="co"># to long time intervals of the time series data when we use</span></span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a><span class="co"># only "Volume" as the predictor</span></span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a>annual_error <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">2</span><span class="sc">:</span><span class="dv">2769</span>){</span>
+<span id="cb33-8"><a href="#cb33-8" aria-hidden="true" tabindex="-1"></a>  train.X <span class="ot">&lt;-</span> new_tseries<span class="sc">$</span>Volume[i<span class="sc">:</span>(i<span class="sc">+</span><span class="dv">249</span>)]</span>
+<span id="cb33-9"><a href="#cb33-9" aria-hidden="true" tabindex="-1"></a>  test.X <span class="ot">&lt;-</span> new_tseries<span class="sc">$</span>Volume[(i<span class="sc">+</span><span class="dv">250</span>)]</span>
+<span id="cb33-10"><a href="#cb33-10" aria-hidden="true" tabindex="-1"></a>  trgt <span class="ot">&lt;-</span> new_tseries<span class="sc">$</span>Label[i<span class="sc">:</span>(i<span class="sc">+</span><span class="dv">249</span>)]</span>
+<span id="cb33-11"><a href="#cb33-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-12"><a href="#cb33-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set.seed</span>(<span class="dv">1</span>)</span>
+<span id="cb33-13"><a href="#cb33-13" aria-hidden="true" tabindex="-1"></a>  knn.pred <span class="ot">&lt;-</span> <span class="fu">knn</span>(<span class="at">train =</span> train.X, <span class="at">test =</span> test.X, trgt, <span class="at">k =</span> <span class="dv">30</span>)</span>
+<span id="cb33-14"><a href="#cb33-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-15"><a href="#cb33-15" aria-hidden="true" tabindex="-1"></a>  t <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(<span class="fu">as.character</span>(knn.pred))</span>
+<span id="cb33-16"><a href="#cb33-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-17"><a href="#cb33-17" aria-hidden="true" tabindex="-1"></a>  annual_error <span class="ot">&lt;-</span> annual_error <span class="sc">+</span> <span class="fu">abs</span>(t <span class="sc">-</span> new_tseries<span class="sc">$</span>Label[(i<span class="sc">+</span><span class="dv">250</span>)])</span>
+<span id="cb33-18"><a href="#cb33-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-19"><a href="#cb33-19" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb33-20"><a href="#cb33-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-21"><a href="#cb33-21" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>((<span class="dv">2768</span> <span class="sc">-</span> annual_error) <span class="sc">/</span> <span class="dv">2768</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.5187861</code></pre>
+</div>
+</div>
+<p>The values of <strong>K</strong> in the above codes are chosen after trying multiple different values for <strong>K</strong>. The results show that the 250-day training time interval with <strong>Date</strong> as the predictor, achieves the best result.</p>
+</section>
+<section id="modeling---linear-regression-for-time-series-dataset" class="level2">
+<h2 class="anchored" data-anchor-id="modeling---linear-regression-for-time-series-dataset">Modeling - Linear Regression for Time Series Dataset</h2>
+<p>In this section, we are trying to find an answer for the third question. For this purpose, for different combination of predictors (i.e.&nbsp;Date only, Volume only, Date + Volume, and Date * Volume) and different time interval sizes (7-day, 20-day, and 250-day), we fit linear regression models and for each scenario we calculate the mean and median RSE as well as mean and median <strong>R<sup>2</sup></strong>. Since the number of scenarios are large (12 scenarios), we only include the best choice of predictors in this document, which is <strong>Date * Volume</strong>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="co"># The following code block prints the median and mean value of RSE and R^2</span></span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Values of fitting the linear regression model for Short Time Intervals</span></span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>new_tseries <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"AABA_2006-01-01_to_2018-01-01.csv"</span>)</span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a>new_tseries<span class="sc">$</span>Date <span class="ot">&lt;-</span> <span class="fu">as.Date</span>(new_tseries<span class="sc">$</span>Date)</span>
+<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a>list_of_weeks <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
+<span id="cb35-8"><a href="#cb35-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-9"><a href="#cb35-9" aria-hidden="true" tabindex="-1"></a>first_week <span class="ot">&lt;-</span> new_tseries[<span class="dv">1</span><span class="sc">:</span><span class="dv">7</span>,]</span>
+<span id="cb35-10"><a href="#cb35-10" aria-hidden="true" tabindex="-1"></a>list_of_weeks <span class="ot">&lt;-</span> <span class="fu">c</span>(list_of_weeks, <span class="fu">list</span>(first_week))</span>
+<span id="cb35-11"><a href="#cb35-11" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="fu">seq</span>(<span class="dv">8</span>, <span class="dv">3019</span>, <span class="at">by=</span><span class="dv">7</span>)){</span>
+<span id="cb35-12"><a href="#cb35-12" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> ((i<span class="sc">+</span><span class="dv">6</span>) <span class="sc">&lt;</span> <span class="dv">3019</span>){</span>
+<span id="cb35-13"><a href="#cb35-13" aria-hidden="true" tabindex="-1"></a>    list_of_weeks <span class="ot">&lt;-</span> <span class="fu">c</span>(list_of_weeks, <span class="fu">list</span>(new_tseries[i<span class="sc">:</span>(i<span class="sc">+</span><span class="dv">6</span>),]))</span>
+<span id="cb35-14"><a href="#cb35-14" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> {</span>
+<span id="cb35-15"><a href="#cb35-15" aria-hidden="true" tabindex="-1"></a>    list_of_weeks <span class="ot">&lt;-</span> <span class="fu">c</span>(list_of_weeks, <span class="fu">list</span>(new_tseries[i<span class="sc">:</span><span class="dv">3019</span>,]))</span>
+<span id="cb35-16"><a href="#cb35-16" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb35-17"><a href="#cb35-17" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb35-18"><a href="#cb35-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-19"><a href="#cb35-19" aria-hidden="true" tabindex="-1"></a>list_of_months <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
+<span id="cb35-20"><a href="#cb35-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-21"><a href="#cb35-21" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="fu">seq</span>(<span class="dv">1</span>, <span class="dv">3019</span>, <span class="at">by=</span><span class="dv">20</span>)){</span>
+<span id="cb35-22"><a href="#cb35-22" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> ((i<span class="sc">+</span><span class="dv">19</span>) <span class="sc">&lt;</span> <span class="dv">3019</span>){</span>
+<span id="cb35-23"><a href="#cb35-23" aria-hidden="true" tabindex="-1"></a>    list_of_months <span class="ot">&lt;-</span> <span class="fu">c</span>(list_of_months, <span class="fu">list</span>(new_tseries[i<span class="sc">:</span>(i<span class="sc">+</span><span class="dv">19</span>),]))</span>
+<span id="cb35-24"><a href="#cb35-24" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> {</span>
+<span id="cb35-25"><a href="#cb35-25" aria-hidden="true" tabindex="-1"></a>    list_of_months <span class="ot">&lt;-</span> <span class="fu">c</span>(list_of_months, <span class="fu">list</span>(new_tseries[i<span class="sc">:</span><span class="dv">3019</span>,]))</span>
+<span id="cb35-26"><a href="#cb35-26" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb35-27"><a href="#cb35-27" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb35-28"><a href="#cb35-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-29"><a href="#cb35-29" aria-hidden="true" tabindex="-1"></a>list_of_years <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
+<span id="cb35-30"><a href="#cb35-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-31"><a href="#cb35-31" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="fu">seq</span>(<span class="dv">1</span>, <span class="dv">3019</span>, <span class="at">by=</span><span class="dv">250</span>)){</span>
+<span id="cb35-32"><a href="#cb35-32" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> ((i<span class="sc">+</span><span class="dv">249</span>) <span class="sc">&lt;</span> <span class="dv">3019</span>){</span>
+<span id="cb35-33"><a href="#cb35-33" aria-hidden="true" tabindex="-1"></a>    list_of_years <span class="ot">&lt;-</span> <span class="fu">c</span>(list_of_years, <span class="fu">list</span>(new_tseries[i<span class="sc">:</span>(i<span class="sc">+</span><span class="dv">249</span>),]))</span>
+<span id="cb35-34"><a href="#cb35-34" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> {</span>
+<span id="cb35-35"><a href="#cb35-35" aria-hidden="true" tabindex="-1"></a>    list_of_years <span class="ot">&lt;-</span> <span class="fu">c</span>(list_of_years, <span class="fu">list</span>(new_tseries[i<span class="sc">:</span><span class="dv">3019</span>,]))</span>
+<span id="cb35-36"><a href="#cb35-36" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb35-37"><a href="#cb35-37" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb35-38"><a href="#cb35-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-39"><a href="#cb35-39" aria-hidden="true" tabindex="-1"></a>vec_of_weekly_lm_rse <span class="ot">&lt;-</span> <span class="fu">c</span>()</span>
+<span id="cb35-40"><a href="#cb35-40" aria-hidden="true" tabindex="-1"></a>vec_of_weekly_lm_r2 <span class="ot">&lt;-</span> <span class="fu">c</span>()</span>
+<span id="cb35-41"><a href="#cb35-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-42"><a href="#cb35-42" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">432</span>){</span>
+<span id="cb35-43"><a href="#cb35-43" aria-hidden="true" tabindex="-1"></a>  fit.rse <span class="ot">&lt;-</span> <span class="fu">summary</span>(<span class="fu">lm</span>(list_of_weeks[[i]]<span class="sc">$</span>Close <span class="sc">~</span> <span class="fu">as.Date</span>(list_of_weeks[[i]]<span class="sc">$</span>Date) <span class="sc">*</span> list_of_weeks[[i]]<span class="sc">$</span>Volume))<span class="sc">$</span>sigma</span>
+<span id="cb35-44"><a href="#cb35-44" aria-hidden="true" tabindex="-1"></a>  vec_of_weekly_lm_rse <span class="ot">&lt;-</span> <span class="fu">append</span>(vec_of_weekly_lm_rse, fit.rse)</span>
+<span id="cb35-45"><a href="#cb35-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-46"><a href="#cb35-46" aria-hidden="true" tabindex="-1"></a>  fit.r2 <span class="ot">&lt;-</span> <span class="fu">summary</span>(<span class="fu">lm</span>(list_of_weeks[[i]]<span class="sc">$</span>Close <span class="sc">~</span> <span class="fu">as.Date</span>(list_of_weeks[[i]]<span class="sc">$</span>Date) <span class="sc">*</span> list_of_weeks[[i]]<span class="sc">$</span>Volume))<span class="sc">$</span>r.squared</span>
+<span id="cb35-47"><a href="#cb35-47" aria-hidden="true" tabindex="-1"></a>  vec_of_weekly_lm_r2 <span class="ot">&lt;-</span> <span class="fu">append</span>(vec_of_weekly_lm_r2, fit.r2)</span>
+<span id="cb35-48"><a href="#cb35-48" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb35-49"><a href="#cb35-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-50"><a href="#cb35-50" aria-hidden="true" tabindex="-1"></a>vec_of_weekly_lm_rse <span class="ot">&lt;-</span> vec_of_weekly_lm_rse[<span class="dv">1</span><span class="sc">:</span><span class="dv">431</span>]</span>
+<span id="cb35-51"><a href="#cb35-51" aria-hidden="true" tabindex="-1"></a>vec_of_weekly_lm_r2 <span class="ot">&lt;-</span> vec_of_weekly_lm_r2[<span class="dv">1</span><span class="sc">:</span><span class="dv">431</span>]</span>
+<span id="cb35-52"><a href="#cb35-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-53"><a href="#cb35-53" aria-hidden="true" tabindex="-1"></a><span class="co"># Mean value of Short Time Interval RSEs</span></span>
+<span id="cb35-54"><a href="#cb35-54" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">mean</span>(vec_of_weekly_lm_rse))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.3455475</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Median value of Short Time Interval RSEs</span></span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">median</span>(vec_of_weekly_lm_rse))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.283229</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Mean value of Short Time Interval R^2s</span></span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">mean</span>(vec_of_weekly_lm_r2))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.7135454</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Median value of Short Time Interval R^2s</span></span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">median</span>(vec_of_weekly_lm_r2))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.7824914</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="co"># The following code block prints the median and mean value of RSE and R^2</span></span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Values of fitting the linear regression model for Medium Time Intervals</span></span>
+<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a>vec_of_monthly_lm_rse <span class="ot">&lt;-</span> <span class="fu">c</span>()</span>
+<span id="cb43-5"><a href="#cb43-5" aria-hidden="true" tabindex="-1"></a>vec_of_monthly_lm_r2 <span class="ot">&lt;-</span> <span class="fu">c</span>()</span>
+<span id="cb43-6"><a href="#cb43-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-7"><a href="#cb43-7" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">151</span>){</span>
+<span id="cb43-8"><a href="#cb43-8" aria-hidden="true" tabindex="-1"></a>  fit.rse <span class="ot">&lt;-</span> <span class="fu">summary</span>(<span class="fu">lm</span>(list_of_months[[i]]<span class="sc">$</span>Close <span class="sc">~</span> <span class="fu">as.Date</span>(list_of_months[[i]]<span class="sc">$</span>Date) <span class="sc">*</span> list_of_months[[i]]<span class="sc">$</span>Volume))<span class="sc">$</span>sigma</span>
+<span id="cb43-9"><a href="#cb43-9" aria-hidden="true" tabindex="-1"></a>  vec_of_monthly_lm_rse <span class="ot">&lt;-</span> <span class="fu">append</span>(vec_of_monthly_lm_rse, fit.rse)</span>
+<span id="cb43-10"><a href="#cb43-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-11"><a href="#cb43-11" aria-hidden="true" tabindex="-1"></a>  fit.r2 <span class="ot">&lt;-</span> <span class="fu">summary</span>(<span class="fu">lm</span>(list_of_months[[i]]<span class="sc">$</span>Close <span class="sc">~</span> <span class="fu">as.Date</span>(list_of_months[[i]]<span class="sc">$</span>Date) <span class="sc">*</span> list_of_months[[i]]<span class="sc">$</span>Volume))<span class="sc">$</span>r.squared</span>
+<span id="cb43-12"><a href="#cb43-12" aria-hidden="true" tabindex="-1"></a>  vec_of_monthly_lm_r2 <span class="ot">&lt;-</span> <span class="fu">append</span>(vec_of_monthly_lm_r2, fit.r2)</span>
+<span id="cb43-13"><a href="#cb43-13" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb43-14"><a href="#cb43-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-15"><a href="#cb43-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Mean value of Medium Time Interval RSEs</span></span>
+<span id="cb43-16"><a href="#cb43-16" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">mean</span>(vec_of_monthly_lm_rse))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.5870633</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Median value of Medium Time Interval RSEs</span></span>
+<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">median</span>(vec_of_monthly_lm_rse))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.4807714</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Mean value of Medium Time Interval R^2s</span></span>
+<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">mean</span>(vec_of_monthly_lm_r2))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.5470991</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb49"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Median value of Medium Time Interval R^2s</span></span>
+<span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">median</span>(vec_of_monthly_lm_r2))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.5480824</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb51"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a><span class="co"># The following code block prints the median and mean value of RSE and R^2</span></span>
+<span id="cb51-2"><a href="#cb51-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Values of fitting the linear regression model for Long Time Intervals</span></span>
+<span id="cb51-3"><a href="#cb51-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb51-4"><a href="#cb51-4" aria-hidden="true" tabindex="-1"></a>vec_of_annual_lm_rse <span class="ot">&lt;-</span> <span class="fu">c</span>()</span>
+<span id="cb51-5"><a href="#cb51-5" aria-hidden="true" tabindex="-1"></a>vec_of_annual_lm_r2 <span class="ot">&lt;-</span> <span class="fu">c</span>()</span>
+<span id="cb51-6"><a href="#cb51-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb51-7"><a href="#cb51-7" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">13</span>){</span>
+<span id="cb51-8"><a href="#cb51-8" aria-hidden="true" tabindex="-1"></a>  fit.rse <span class="ot">&lt;-</span> <span class="fu">summary</span>(<span class="fu">lm</span>(list_of_years[[i]]<span class="sc">$</span>Close <span class="sc">~</span> <span class="fu">as.Date</span>(list_of_years[[i]]<span class="sc">$</span>Date) <span class="sc">*</span> list_of_years[[i]]<span class="sc">$</span>Volume))<span class="sc">$</span>sigma</span>
+<span id="cb51-9"><a href="#cb51-9" aria-hidden="true" tabindex="-1"></a>  vec_of_annual_lm_rse <span class="ot">&lt;-</span> <span class="fu">append</span>(vec_of_annual_lm_rse, fit.rse)</span>
+<span id="cb51-10"><a href="#cb51-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb51-11"><a href="#cb51-11" aria-hidden="true" tabindex="-1"></a>  fit.r2 <span class="ot">&lt;-</span> <span class="fu">summary</span>(<span class="fu">lm</span>(list_of_years[[i]]<span class="sc">$</span>Close <span class="sc">~</span> <span class="fu">as.Date</span>(list_of_years[[i]]<span class="sc">$</span>Date) <span class="sc">*</span> list_of_years[[i]]<span class="sc">$</span>Volume))<span class="sc">$</span>r.squared</span>
+<span id="cb51-12"><a href="#cb51-12" aria-hidden="true" tabindex="-1"></a>  vec_of_annual_lm_r2 <span class="ot">&lt;-</span> <span class="fu">append</span>(vec_of_annual_lm_r2, fit.r2)</span>
+<span id="cb51-13"><a href="#cb51-13" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb51-14"><a href="#cb51-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb51-15"><a href="#cb51-15" aria-hidden="true" tabindex="-1"></a>vec_of_annual_lm_rse <span class="ot">&lt;-</span> vec_of_annual_lm_rse[<span class="dv">1</span><span class="sc">:</span><span class="dv">12</span>]</span>
+<span id="cb51-16"><a href="#cb51-16" aria-hidden="true" tabindex="-1"></a>vec_of_annual_lm_r2 <span class="ot">&lt;-</span> vec_of_annual_lm_r2[<span class="dv">1</span><span class="sc">:</span><span class="dv">12</span>]</span>
+<span id="cb51-17"><a href="#cb51-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb51-18"><a href="#cb51-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Mean value of Long Time Interval RSEs</span></span>
+<span id="cb51-19"><a href="#cb51-19" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">mean</span>(vec_of_annual_lm_rse))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 1.915588</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb53"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Median value of Long Time Interval RSEs</span></span>
+<span id="cb53-2"><a href="#cb53-2" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">median</span>(vec_of_annual_lm_rse))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 1.949924</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb55"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Mean value of Long Time Interval R^2s</span></span>
+<span id="cb55-2"><a href="#cb55-2" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">mean</span>(vec_of_annual_lm_r2))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.5960884</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb57"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Median value of Long Time Interval R^2s</span></span>
+<span id="cb57-2"><a href="#cb57-2" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">median</span>(vec_of_annual_lm_r2))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.6797282</code></pre>
+</div>
+</div>
+<p>For each time interval size, we have provided a plot that shows the <strong>R<sup>2</sup></strong> value corresponding to fitting a linear model (with <strong>Date * Volume</strong> predictor) for each interval. These plots are shown below for long time intervals, medium time intervals, and short time intervals, respectively. We can see that for each time interval size, the value of <strong>R<sup>2</sup></strong> changes significantly when we use different time intervals for the modeling. However, we can see that this oscillation occurs mostly around certain values. These values are close to the mean <strong>R<sup>2</sup></strong> value for each time interval size (the mean values are printed in the above codes).</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb59"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a>x1 <span class="ot">&lt;-</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">431</span></span>
+<span id="cb59-2"><a href="#cb59-2" aria-hidden="true" tabindex="-1"></a>x2 <span class="ot">&lt;-</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">151</span></span>
+<span id="cb59-3"><a href="#cb59-3" aria-hidden="true" tabindex="-1"></a>x3 <span class="ot">&lt;-</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">12</span></span>
+<span id="cb59-4"><a href="#cb59-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-5"><a href="#cb59-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-6"><a href="#cb59-6" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(x3, vec_of_annual_lm_r2, <span class="at">type =</span> <span class="st">"l"</span>, <span class="at">xlab =</span> <span class="st">"Long Time Interval"</span>, <span class="at">ylab =</span> <span class="fu">expression</span>(<span class="st">"R"</span><span class="sc">^</span><span class="dv">2</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Written_Presentation_Revised_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb60"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(x2, vec_of_monthly_lm_r2, <span class="at">type =</span> <span class="st">"l"</span>, <span class="at">xlab =</span> <span class="st">"Medium Time Interval"</span>, <span class="at">ylab =</span> <span class="fu">expression</span>(<span class="st">"R"</span><span class="sc">^</span><span class="dv">2</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Written_Presentation_Revised_files/figure-html/unnamed-chunk-9-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb61"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb61-1"><a href="#cb61-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(x1, vec_of_weekly_lm_r2, <span class="at">type =</span> <span class="st">"l"</span>, <span class="at">xlab =</span> <span class="st">"Short Time Interval"</span>, <span class="at">ylab =</span> <span class="fu">expression</span>(<span class="st">"R"</span><span class="sc">^</span><span class="dv">2</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Written_Presentation_Revised_files/figure-html/unnamed-chunk-9-3.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="modeling---classification-for-daily-news-dataset" class="level2">
+<h2 class="anchored" data-anchor-id="modeling---classification-for-daily-news-dataset">Modeling - Classification for Daily News Dataset</h2>
+<p>For classifying the datapoints of the Daily News dataset, we need to use a NLP model. For this purpose, we have used three types of NLP-Classification methods:</p>
+<ul>
+<li>Simple Indexing + Multilayer Perceptron/Random Forest: For this case, we simply collect all of the words in the dataset and assign a distinct index to each word, then we replace each word with its corresponding index in the news dataset. After that we apply Multilayer Perceptron/Random Forest for classifying the encoded news.</li>
+</ul>
+<p>The training accuracy of the MLP model, which has three layers fully-connected architecture, converges to approximately 50% after 2 epochs and does not change afterwards. This means that the model is not able to learn any pattern from the dataset.</p>
+<p>For using the random forest classifier, we use approximately 75% of the dataset for training and rest of the dataset is used for testing the trained model. For using Top25, Top10, Top5, and Top1 Daily News, we achieve 0.533, 0.503, 0.505, 0.527 accuracy, respectively. The code for this method can be found at: <a href="https://github.com/nimnik/CS-670/blob/main/index_nlp.ipynb" class="uri">https://github.com/nimnik/CS-670/blob/main/index_nlp.ipynb</a>. <strong>Note:</strong> Please note that except for the text encoding part of the code, the rest of the code is from the following source: <a href="https://inside-machinelearning.com/en/a-simple-and-efficient-model-for-binary-classification-in-nlp/#Create_our_Deep_Learning_model_-_Binary_Classification_NLP" class="uri">https://inside-machinelearning.com/en/a-simple-and-efficient-model-for-binary-classification-in-nlp/#Create_our_Deep_Learning_model_-_Binary_Classification_NLP</a>.</p>
+<ul>
+<li>Word2Vec + Multilayer Perceptron/Random Forest: Word2Vec is a well-known text encoding method. After using this encoding, we use the same classifiers as the previous NLP-Classification method (MLP and RF). Similar to the previous method, the training accuracy of the MLP model converges to approximately 50% and will not get any better.</li>
+</ul>
+<p>For using the random forest classifier, we use approximately 75% of the dataset for training and rest of the dataset is used for testing the trained model. For using Top25, Top10, Top5, and Top1 Daily News, we achieve 0.458, 0.484, 0.531, 0.548 accuracy, respectively. The code for this method can be found at: <a href="https://github.com/nimnik/CS-670/blob/main/word2vec_nlp.ipynb" class="uri">https://github.com/nimnik/CS-670/blob/main/word2vec_nlp.ipynb</a>. <strong>Note:</strong> Please note that except for the text encoding part of the code, the rest of the code is from the following source: <a href="https://github.com/dilipvaleti/Binary-Classification-using-word2vect/blob/main/Classification%20using%20word2vect.ipynb" class="uri">https://github.com/dilipvaleti/Binary-Classification-using-word2vect/blob/main/Classification%20using%20word2vect.ipynb</a>.</p>
+<ul>
+<li>BERT Pretrained Model: BERT is a state-of-the-art transformer based model that is widely used for NLP-Classification tasks (and more). The following plots show the result of training this model using Top1, Top5, Top10, and Top25 Daily News.</li>
+</ul>
+<p>For implmenting a classifier using BERT, we use Pytorch platform and from the HuggingFace Transformers toolkit, we load a binary classifier that consists of the normal pre-trained BERT model with an added single linear layer on top for classification that is used as a sentence classifier. This means that we are fine tuning the BERT model to classify the news (either top1, top5, top10, or top25 news) into two calsses that correspond to the main labels: Label 1, which means the input news either have no effect on the DJIA index direction or cause the index to increase, and Label 0, which means the input news cause the index to decrease.</p>
+<p><img src="fig12.png" class="img-fluid" alt="Top 1"> <br></p>
+<p><img src="fig11.png" class="img-fluid" alt="Top 5"> <br></p>
+<p><img src="fig10.png" class="img-fluid" alt="Top 10"> <br></p>
+<p><img src="fig9.png" class="img-fluid" alt="Top 25"> <br></p>
+<p>The code for this method can be found at: <a href="https://github.com/nimnik/CS-670/blob/main/BERT_nlp.ipynb" class="uri">https://github.com/nimnik/CS-670/blob/main/BERT_nlp.ipynb</a>. <strong>Note:</strong> Please note that except for the text encoding part of the code, the rest of the code is from the following source: <a href="https://www.kaggle.com/code/mexwell/bert-for-binary-classification" class="uri">https://www.kaggle.com/code/mexwell/bert-for-binary-classification</a>.</p>
+</section>
+<section id="results-and-analysis" class="level2">
+<h2 class="anchored" data-anchor-id="results-and-analysis">Results and Analysis</h2>
+<ol type="1">
+<li><p>None of the classification methods that we used, can reasonably predict the direction of DJIA movement index, as all of them achieve an accuracy rate around 50%.</p></li>
+<li><p>The frequency of training data does not have a significant impact on the prediction for a new test datapoint. This can be seen by very small differences between the accuracies that are achieved by the logistic regression model and the KNN model for different training time interval sizes.</p></li>
+<li><p>Neither in Daily News clasification methods nor in DJIA Time Series classification methods, changing the predictors does not seem to have a specific impact one the accuracy of the predtions that are made by the trained models. However, slight differences in accuracy can be observed when using different predictors for training the Random Forest model.</p></li>
+<li><p>Both the predictors and the training time interval sizes can have significant impact on the results of linear regression model and based on the results achieved by this model, we can say that using 7-day time interval size as well as using <strong>Volume * Date</strong> predictor can help us a lot with finding a pattern in the time series dataset and hence, the answer to the 3rd question would be <strong>Short Training Time Intervals</strong> is a better choice compared to the medium time intervals and large time intervals, when we try to find a pattern in time series data of DJIA.</p></li>
+</ol>
+<p>In conclusion, DJIA index direction seems to be independent of the Daily News data and the Time Series data, however, if we want to find a pattern in the time series of the index, short time intervals (i.e.&nbsp;7-day interval) are more reasonable choics compared to the longer time intervals.</p>
+</section>
+<section id="limitation" class="level2">
+<h2 class="anchored" data-anchor-id="limitation">Limitation</h2>
+<p>The main limitation of this work was the few number of datapoints in Daily News Dataset. For this reason, I could not explore for an asnwer to the questions 1 and 3 using this dataset.</p>
+</section>
+<section id="impact" class="level2">
+<h2 class="anchored" data-anchor-id="impact">Impact</h2>
+<ol type="1">
+<li><p>The data that I used for this project is publicly avialable. Specifically, anyone can collect a time series for a specific stock value or a specific index and the daily news can be collected using any News API. This means that the usage of this data, to the best of my knowledge, cannot have a negative ethical impact on others (or does not violate the privacy of anyone).</p></li>
+<li><p>In general, we can see the stock market as a system which is highly affected by the human behavior. This means that predicting such a system can itself lead to specific changes in the market. This means that there is no surprise that it is difficult to predict the future behavior of such a system.</p></li>
+<li><p>Finally, I think this work can help someone who is interested in finding the short term trend of a specific stock value (especially DJIA index), by providing a linear regression model that can be fitted reasonably to the short term time series data of the stock’s value.</p></li>
+</ol>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
